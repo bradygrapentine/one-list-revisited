@@ -1,11 +1,11 @@
-import React from 'react'
+// import React from 'react'
 
-export function ToDoItemList(props) {
-  return props.todoItems.map(function (todoItem) {
-    return (
-      <li key={todoItem.id} className={todoItem.complete ? 'completed' : ''}>
-        {todoItem.text}
-      </li>
-    )
-  })
-}
+// export function ToDoItemList(props) {
+//   return props.todoItems.map(function (todoItem) {
+//     return (
+//       <li key={todoItem.id} complete={todoItem.complete} className={todoItem.complete ? 'completed' : ''}>
+//         {todoItem.text}
+//       </li>
+//     )
+//   })
+// }

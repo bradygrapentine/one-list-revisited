@@ -1,16 +1,15 @@
 import axios from 'axios'
 import React, { useState, useEffect } from 'react'
-// @ts-ignore
-// import logo from './favicon.ico'
 // import { ToDoItemList } from './components/ToDoItemList'
 import { PageFooter } from './components/PageFooter'
 import { ToDoItem } from './components/ToDoItem'
 
 export function App() {
   const [todoItems, setTodoItems] = useState([])
-  const [listName, setListName] = useState(localStorage.getItem('list-name'))
+  const [listName, setListName] = useState(
+    localStorage.getItem('list-name') || 'cohort42'
+  )
   const [newToDoText, setNewToDoText] = useState('')
-  // const [newToDoItems, setNewToDoItems] = useState([])
 
   async function loadTheItems() {
     const response = await axios.get(
@@ -18,7 +17,9 @@ export function App() {
     )
     if (response.status == 200) {
       console.log(response.data)
-      // response.data is an array of objects, since we hard-coded an array of the same form, API data formats in accordance with our specifications
+      // response.data is an array of objects,
+
+      // since we hard-coded an array of the same form, API data formats in accordance with our specifications
       setTodoItems(response.data)
     }
     // only runs on mount
@@ -26,24 +27,10 @@ export function App() {
 
   useEffect(
     function () {
-      // this is where API access goes
-
       loadTheItems()
-      // calling the inner function in the outer function to avoid js throwing
-      // an error because main use effect fn was async
     },
     [listName]
   )
-
-  // function handleClick42() {
-  //   setListName('cohort42')
-  // }
-  // function handleClick21() {
-  //   setListName('cohort21')
-  // }
-  // function handleIllustriousVoyage() {
-  //   setListName('illustriousvoyage')
-  // }
 
   async function handleCreateNewItem(event) {
     event.preventDefault()
@@ -88,19 +75,20 @@ export function App() {
               Illustrious Voyage
             </button>
           </li>
-          <ul>
-            {todoItems.map(function (todoItem) {
-              return (
-                <ToDoItem
-                  key={todoItem.id}
-                  listName={listName}
-                  reloadAfterChange={loadTheItems}
-                  complete={todoItem.complete}
-                  text={todoItem.text}
-                ></ToDoItem>
-              )
-            })}
-          </ul>
+        </ul>
+        <ul>
+          {todoItems.map(function (todoItem) {
+            return (
+              <ToDoItem
+                key={todoItem.id}
+                listName={listName}
+                reloadAfterChange={loadTheItems}
+                id={todoItem.id}
+                complete={todoItem.complete}
+                text={todoItem.text}
+              ></ToDoItem>
+            )
+          })}
           {/* <ToDoItemList todoItems={todoItems} /> */}
         </ul>
         <form onSubmit={handleCreateNewItem}>
