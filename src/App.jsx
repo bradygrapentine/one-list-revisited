@@ -44,6 +44,10 @@ export function App() {
     )
     if (response.status === 201) {
       loadTheItems()
+      // const newToDo = response.data
+      // const newToDoItems = [...todoItems, newToDo]
+      // setTodoItems(newToDoItems) ==> appends item directly to state from response data,
+      //                                faster than loading items but you can't see other people's additions until you refresh the page
     }
     setNewToDoText('')
   }
