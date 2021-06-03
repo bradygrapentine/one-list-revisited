@@ -1,28 +1,20 @@
 import axios from 'axios'
 import React, { useState, useEffect } from 'react'
 // @ts-ignore
-import logo from './favicon.ico'
-import { ToDoItemList } from './components/ToDoItemList'
+// import logo from './favicon.ico'
+// import { ToDoItemList } from './components/ToDoItemList'
 import { PageFooter } from './components/PageFooter'
+import { ToDoItem } from './components/ToDoItem'
 
 export function App() {
-  const [todoItems, setTodoItems] = useState([]) // if no empty array here, react throws error ==> empty version of whatever API returns
-  // { id: 1, text: 'Do a thing', complete: false },
-  // { id: 2, text: 'Do something else', complete: false },
-  // { id: 3, text: 'Do a third thing', complete: false },
-  // { id: 4, text: 'Remind me about the important thing', complete: true },
-  // //{
-  // //   id: 5,
-  // //   text: 'The important things are the important things',
-  // //   complete: false,
-  // // },
-  //])
+  const [todoItems, setTodoItems] = useState([])
+  const [listName, setListName] = useState(localStorage.getItem('list-name'))
+  const [newToDoText, setNewToDoText] = useState('')
+  // const [newToDoItems, setNewToDoItems] = useState([])
 
-  // @ts-ignore
-  useEffect(async function () {
-    // this is where API access goes
+  async function loadTheItems() {
     const response = await axios.get(
-      'https://one-list-api.herokuapp.com/items?access_token=cohort42'
+      `https://one-list-api.herokuapp.com/items?access_token=${listName}`
     )
     if (response.status == 200) {
       console.log(response.data)
@@ -30,7 +22,49 @@ export function App() {
       setTodoItems(response.data)
     }
     // only runs on mount
-  }, [])
+  }
+
+  useEffect(
+    function () {
+      // this is where API access goes
+
+      loadTheItems()
+      // calling the inner function in the outer function to avoid js throwing
+      // an error because main use effect fn was async
+    },
+    [listName]
+  )
+
+  // function handleClick42() {
+  //   setListName('cohort42')
+  // }
+  // function handleClick21() {
+  //   setListName('cohort21')
+  // }
+  // function handleIllustriousVoyage() {
+  //   setListName('illustriousvoyage')
+  // }
+
+  async function handleCreateNewItem(event) {
+    event.preventDefault()
+    const response = await axios.post(
+      `https://one-list-api.herokuapp.com/items?access_token=${listName}`,
+      {
+        item: {
+          text: newToDoText,
+        },
+      }
+    )
+    if (response.status === 201) {
+      loadTheItems()
+    }
+    setNewToDoText('')
+  }
+
+  function handleChangeListName(newListName) {
+    setListName(newListName)
+    localStorage.setItem('list-name', newListName)
+  }
 
   return (
     <div className="app">
@@ -39,10 +73,43 @@ export function App() {
       </header>
       <main>
         <ul>
-          <ToDoItemList todoItems={todoItems} />
+          <li>
+            <button onClick={() => handleChangeListName('cohort42')}>
+              Cohort 42
+            </button>
+          </li>
+          <li>
+            <button onClick={() => handleChangeListName('cohort21')}>
+              Cohort 21
+            </button>
+          </li>
+          <li>
+            <button onClick={() => handleChangeListName('illustriousvoyage')}>
+              Illustrious Voyage
+            </button>
+          </li>
+          <ul>
+            {todoItems.map(function (todoItem) {
+              return (
+                <ToDoItem
+                  key={todoItem.id}
+                  listName={listName}
+                  reloadAfterChange={loadTheItems}
+                  complete={todoItem.complete}
+                  text={todoItem.text}
+                ></ToDoItem>
+              )
+            })}
+          </ul>
+          {/* <ToDoItemList todoItems={todoItems} /> */}
         </ul>
-        <form>
-          <input type="text" placeholder="Whats up?" />
+        <form onSubmit={handleCreateNewItem}>
+          <input
+            type="text"
+            placeholder="Whats up?"
+            value={newToDoText}
+            onChange={(event) => setNewToDoText(event.target.value)}
+          />
         </form>
       </main>
       <PageFooter />
